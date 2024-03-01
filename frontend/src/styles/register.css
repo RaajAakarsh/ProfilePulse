@@ -1,0 +1,95 @@
+.register-container {
+	height: 100vh;
+	margin-top: 72px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.register-form {
+	border: rgb(255, 255, 255) solid 2px;
+	padding: 30px;
+	width: 350px;
+	height: 500px;
+	background-color: #5c2018ac;
+	border-radius: 15px;
+	backdrop-filter: blur(5px);
+	box-shadow: 15px 15px 0 black;
+	position: relative;
+	top: -35px;
+	display: flex;
+	flex-direction: column;
+    overflow-y: scroll;
+}
+
+.register-form-heading {
+	font-weight: 600;
+	font-size: 25px;
+	color: var(--white-pink);
+	text-align: center;
+	text-decoration: underline;
+}
+
+.register-form-start {
+	padding: 8px;
+}
+
+form {
+	display: flex;
+	flex-direction: column;
+	color: var(--white-pink);
+}
+
+form label {
+	padding-left: 10px;
+	font-weight: 600;
+}
+
+input:focus {
+	outline: none;
+	box-shadow: 5px 5px 0 white;
+}
+
+input[type="email"],
+input[type="password"],
+input[type="text"] {
+	padding: 6px;
+	border-radius: 50px;
+	border: 1px solid white;
+	background: none;
+	margin-bottom: 15px;	
+	font-size: 17px;
+	color: rgb(0, 0, 0);
+	font-weight: 600;
+}
+
+input[type="password"] {
+	margin-bottom: 15px;
+}
+input[type="submit"] {
+	border-radius: 50px;
+	border: none;
+	background-color: var(--white-pink);
+	margin-bottom: 15px;
+	padding: 3px;
+}
+input[type="submit"]:focus {
+	outline: none;
+	box-shadow: 0px 0px 10px rgb(0, 0, 0);
+}
+
+.register-form-checkbox {
+	display: flex;
+	margin-bottom: 15px;
+	margin-top: 25px;
+	margin-left: 15px;
+}
+
+.register-form-checkbox input {
+	position: relative;
+	top: -15px;
+	margin: 5px;
+	outline: none;
+	box-shadow: 0px 0px 0 white;
+	border: none;
+}
