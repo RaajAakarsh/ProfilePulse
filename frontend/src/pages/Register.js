@@ -74,10 +74,6 @@ const Register = () => {
 							onChange={(e) => setRPassword(e.target.value)}
 							required
 						/>
-						<div className="register-form-checkbox">
-							<input type="checkbox" />
-							<label> Yes, I would like to receive newsletters.</label>
-						</div>
 						<input type="submit" />
 						<p>
 							Already registered? <Link to={"/login"}>Sign in</Link>

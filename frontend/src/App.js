@@ -5,6 +5,7 @@ import Home from "./pages/Home";
 import Login from "./pages/login";
 import Register from "./pages/Register";
 import UsersPage from "./pages/UsersPage";
+import EditInfo from "./pages/EditInfo";
 import "./styles/App.css";
 
 function App() {
@@ -46,6 +47,7 @@ function App() {
 						<Route exact path="/login" element={<Login setName={setName} />} />
 						<Route exact path="/register" element={<Register />} />
 						<Route exact path="/users" element={<UsersPage />} />
+						<Route exact path="/edit-profile" element={<EditInfo />} />
 					</Routes>
 				</main>
 			</Router>
