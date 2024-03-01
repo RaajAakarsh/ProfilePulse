@@ -13,15 +13,15 @@
 	top: -35px;
 	transition: all 0.5s;
 }
-.user-dashboard:hover{
+.user-dashboard:hover {
 	backdrop-filter: blur(5px);
 	background-color: #5c2018ac;
 }
-.user-dashboard-inner{
-	display:flex;
+.user-dashboard-inner {
+	display: flex;
 }
 .user-image {
-	border: rgb(255, 255, 255) solid 1px;	
+	border: rgb(255, 255, 255) solid 1px;
 	border-radius: 50%;
 	padding: 10px;
 	display: flex;
@@ -29,7 +29,7 @@
 	justify-content: center;
 	height: 222px;
 }
-.user-image img{
+.user-image img {
 	height: 200px;
 	border-radius: 50%;
 }
@@ -38,15 +38,40 @@
 	flex-direction: column;
 	margin-left: 25px;
 }
+.user-name-section {
+	display: flex;
+	justify-content: space-between;
+}
+.user-profile-edit-icon {
+	height: 45px;
+	background: #5c2018;
+	padding: 10px;
+	border-radius: 50px;
+	transition: all 0.2s;
+	box-shadow: 0 0 0 white;
+	position: relative;
+	top: -10px;
+	left: -10px;
+}
+.user-profile-edit-icon:hover {
+	box-shadow: 3px 3px 0 white;
+	background: #bb4030;
+}
+.user-name-section img {
+	height: 25px;
+	position: relative;
+	left: 2px;
+	top: -1px;
+}
 .user-name {
 	color: var(--white-pink);
 	font-style: italic;
-	font-size: 30px;
+	font-size: 35px;
 	font-weight: 800;
 }
 .user-email {
 	position: relative;
-	top: -13px;
+	top: -12px;
 	color: var(--pink);
 	font-weight: 800;
 }
@@ -55,20 +80,20 @@
 	font-weight: 800;
 	text-align: justify;
 }
-.user-dashboard-authentication-error-div{
+.user-dashboard-authentication-error-div {
 	display: flex;
 	flex-direction: column;
 }
-.user-dashboard-authentication-error{
+.user-dashboard-authentication-error {
 	font-size: 30px;
 	font-weight: 900;
 	font-family: Arial, Helvetica, sans-serif;
 	color: rgb(0, 0, 0);
 	text-align: center;
 	padding-left: 100px;
-	padding-top:90px;
+	padding-top: 90px;
 }
-.user-dashboard-authentication-error-div a{
+.user-dashboard-authentication-error-div a {
 	font-size: 25px;
 	font-style: italic;
 	text-align: end;
@@ -76,4 +101,39 @@
 	margin-top: 20px;
 	margin-right: 20px;
 }
- 
+.user-profile-changes {
+	display: flex;
+	flex-direction: row;
+	justify-content: end;
+	margin-top: 30px;
+}
+.user-password-change {
+	margin-right: 20px;
+}
+.user-delete-profile {
+	border: green 0px;
+}
+.user-delete-profile button,
+.user-password-change button {
+	border-radius: 500px;
+	background: #5c2018;
+	border: none;
+	box-shadow: 0 0 0 white;
+	padding: 8px;
+	font-size: 13px;
+	color: white;
+	transition: all 0.2s;
+}
+.user-delete-profile button:hover,
+.user-password-change button:hover {
+	background: #bb4030;
+	padding: 8px;
+	font-size: 13px;
+	color: white;
+	box-shadow: 3px 3px 0 white;
+}
+.user-password-change img {
+	height: 15px;
+	position: relative;
+	top: -1px;
+}

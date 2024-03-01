@@ -21,12 +21,12 @@ const Navbar = (props) => {
 		menu = (
 			<ul className="navbar-menu">
 				<li>
-					<Link className="heading-font" to="/login">
+					<Link className="heading-font nav-hover-shadow" to="/login">
 						Login
 					</Link>
 				</li>
 				<li>
-					<Link className="heading-font" to="/register">
+					<Link className="heading-font nav-hover-shadow" to="/register">
 						Register
 					</Link>
 				</li>
@@ -36,12 +36,12 @@ const Navbar = (props) => {
 		menu = (
 			<ul className="navbar-menu">
 				<li>
-					<Link className="heading-font" to="/users">
+					<Link className="heading-font nav-hover-shadow" to="/users">
 						Users
 					</Link>
 				</li>
 				<li>
-					<Link className="heading-font" to="/login" onClick={Logout}>
+					<Link className="heading-font nav-hover-shadow" to="/login" onClick={Logout}>
 						Logout
 					</Link>
 				</li>

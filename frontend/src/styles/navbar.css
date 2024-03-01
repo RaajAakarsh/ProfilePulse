@@ -45,3 +45,9 @@
 .navbar-menu li {
 	margin: 15px;
 }
+.nav-hover-shadow{
+	text-shadow: 0 0 0px white;
+}
+.nav-hover-shadow:hover{
+	text-shadow: 0 0 20px white;
+}
