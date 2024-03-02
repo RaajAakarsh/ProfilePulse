@@ -16,6 +16,11 @@ const Register = () => {
 	const submit = async (e) => {
 		e.preventDefault();
 
+		if (!name.trim()) {
+			setErrorResponse("Please provide a valid name");
+			return;
+		}
+
 		if (password !== rPassword) {
 			setErrorMessage(true);
 		} else {

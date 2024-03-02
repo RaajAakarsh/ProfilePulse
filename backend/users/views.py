@@ -4,6 +4,8 @@ from rest_framework.response import Response
 from rest_framework.exceptions import AuthenticationFailed, ValidationError
 from .models import User
 import jwt, datetime
+from django.http import JsonResponse
+from django.db import transaction
 
 
 class RegisterView(APIView):
@@ -82,6 +84,44 @@ class UsersListView(APIView):
         users = User.objects.all()
         serialized_users = UserSerializer(users, many=True)
         return Response(serialized_users.data)
+
+
+class EditProfileView(APIView):
+    def post(self, request):
+        new_username = request.data["username"]
+        new_email = request.data["email"]
+        token = request.COOKIES.get("jwt")
+
+        if not token:
+            raise AuthenticationFailed(
+                "Error - Unauthenticated (No Token - Editing profile)"
+            )
+
+        try:
+            payload = jwt.decode(token, "secret", algorithms=["HS256"])
+            user_id = payload["id"]
+        except jwt.ExpiredSignatureError:
+            raise AuthenticationFailed(
+                "Error - Unathenticated Token Expired users list"
+            )
+        
+        if new_email and User.objects.exclude(id=user_id).filter(email=new_email).exists():
+            raise ValidationError("Error - Email already exists.")
+
+        try:
+            with transaction.atomic():
+                user = User.objects.select_for_update().get(pk=user_id)
+                if new_username:
+                    user.name = new_username
+                if new_email:
+                    user.email = new_email
+                user.save()
+        except User.DoesNotExist:
+            return JsonResponse({"error": "User does not exist"}, status=404)
+
+        user = User.objects.filter(id=payload["id"]).first()
+        serializer = UserSerializer(user)
+        return Response(serializer.data)
 
 
 class LogoutView(APIView):
