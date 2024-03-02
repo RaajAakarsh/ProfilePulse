@@ -19,7 +19,7 @@ const EditInfo = (props) => {
 		}
 
 		if (!email.trim()) {
-			setEmail("Please provide a valid name");
+			setUserMessage("Please provide a valid email");
 			return;
 		}
 
@@ -47,12 +47,12 @@ const EditInfo = (props) => {
 
 	let edit_page;
 	if (props.name === "") {
-		<div className="login-form"></div>;
+		<div className="edit-info-form"></div>;
 	} else {
 		edit_page = (
-			<div className="login-form">
-				<div className="login-form-heading heading-font">EDIT PROFILE</div>
-				<div className="login-form-start">
+			<div className="edit-info-form">
+				<div className="edit-info-form-heading heading-font">EDIT PROFILE</div>
+				<div className="edit-info-form-start">
 					<form onSubmit={Submit}>
 						<label>Username</label>
 						<input
@@ -80,7 +80,7 @@ const EditInfo = (props) => {
 
 	return (
 		<>
-			<div className="login-container">{edit_page}</div>
+			<div className="edit-info-container">{edit_page}</div>
 			<div></div>
 		</>
 	);
