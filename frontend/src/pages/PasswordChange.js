@@ -32,7 +32,7 @@ const PasswordChange = (props) => {
 		if (newPassword !== retypeNewPassword) {
 			setErrorBool(true);
 		} else {
-			const response = await fetch("http://localhost:8000/api/editProfile", {
+			const response = await fetch("http://localhost:8000/api/passwordReset", {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
 				credentials: "include",
