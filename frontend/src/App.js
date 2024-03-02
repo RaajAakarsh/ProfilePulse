@@ -7,6 +7,7 @@ import Register from "./pages/Register";
 import UsersPage from "./pages/UsersPage";
 import EditInfo from "./pages/EditInfo";
 import "./styles/App.css";
+import PasswordChange from "./pages/PasswordChange";
 
 function App() {
 	const [name, setName] = useState("");
@@ -51,6 +52,11 @@ function App() {
 							exact
 							path="/edit-profile"
 							element={<EditInfo name={name} setName={setName} />}
+						/>
+						<Route
+							exact
+							path="/password-change"
+							element={<PasswordChange name={name} setName={setName} />}
 						/>
 					</Routes>
 				</main>

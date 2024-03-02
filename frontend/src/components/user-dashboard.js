@@ -34,10 +34,12 @@ const UserDashboard = (props) => {
 						</div>
 						<div className="user-profile-changes">
 							<div className="user-password-change">
-								<button>
-									Password&nbsp;
-									<img src={icon_editing} alt="" />
-								</button>
+								<Link to="/password-change">
+									<button>
+										Password&nbsp;
+										<img src={icon_editing} alt="" />
+									</button>
+								</Link>
 							</div>
 							{/* <div className="user-delete-profile">
 								<button>Delete Profile</button>
