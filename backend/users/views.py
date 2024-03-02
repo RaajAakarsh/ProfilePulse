@@ -2,6 +2,7 @@ from rest_framework.views import APIView
 from .serializers import UserSerializer
 from rest_framework.response import Response
 from rest_framework.exceptions import AuthenticationFailed, ValidationError
+from django.contrib.auth.hashers import check_password
 from .models import User
 import jwt, datetime
 from django.http import JsonResponse
@@ -104,8 +105,11 @@ class EditProfileView(APIView):
             raise AuthenticationFailed(
                 "Error - Unathenticated Token Expired users list"
             )
-        
-        if new_email and User.objects.exclude(id=user_id).filter(email=new_email).exists():
+
+        if (
+            new_email
+            and User.objects.exclude(id=user_id).filter(email=new_email).exists()
+        ):
             raise ValidationError("Error - Email already exists.")
 
         try:
@@ -122,6 +126,46 @@ class EditProfileView(APIView):
         user = User.objects.filter(id=payload["id"]).first()
         serializer = UserSerializer(user)
         return Response(serializer.data)
+
+
+class PasswordResetView(APIView):
+    def post(self, request):
+        curr_password = request.data["currPassword"]
+        new_password = request.data["newPassword"]
+        token = request.COOKIES.get("jwt")
+
+        if not token:
+            raise AuthenticationFailed(
+                "Error - Unauthenticated (No Token - Password reset)"
+            )
+
+        try:
+            payload = jwt.decode(token, "secret", algorithms=["HS256"])
+            user_id = payload["id"]
+        except jwt.ExpiredSignatureError:
+            raise AuthenticationFailed(
+                "Error - Unathenticated Token Expired users list"
+            )
+
+        user = User.objects.filter(id=user_id).first()
+
+        if not curr_password:
+            raise ValidationError("Error - Current password is required")
+
+        if not check_password(curr_password, user.password):
+            raise ValidationError("Error - Incorrect old password")
+
+        try:
+            with transaction.atomic():
+                user.set_password(new_password)
+                user.save()
+        except User.DoesNotExist:
+            return JsonResponse({"error": "User does not exist"}, status=404)
+
+        response = Response()
+        response.delete_cookie("jwt")
+        response.data = {"message": "successfully logged out"}
+        return response
 
 
 class LogoutView(APIView):
