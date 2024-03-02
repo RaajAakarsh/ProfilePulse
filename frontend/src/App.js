@@ -47,7 +47,11 @@ function App() {
 						<Route exact path="/login" element={<Login setName={setName} />} />
 						<Route exact path="/register" element={<Register />} />
 						<Route exact path="/users" element={<UsersPage />} />
-						<Route exact path="/edit-profile" element={<EditInfo />} />
+						<Route
+							exact
+							path="/edit-profile"
+							element={<EditInfo name={name} setName={setName} />}
+						/>
 					</Routes>
 				</main>
 			</Router>
