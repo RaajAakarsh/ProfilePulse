@@ -1,24 +1,65 @@
-from rest_framework.views import APIView
-from .serializers import UserSerializer
-from rest_framework.response import Response
-from rest_framework.exceptions import AuthenticationFailed, ValidationError
+from django.contrib.sites.shortcuts import get_current_site
 from django.contrib.auth.hashers import check_password
-from .models import User
-import jwt, datetime
+from rest_framework.exceptions import AuthenticationFailed, ValidationError
+from rest_framework.response import Response
+from django.template.loader import render_to_string
+from django.utils.encoding import force_bytes, force_str
+from rest_framework.views import APIView
+from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
+from django.core.mail import EmailMessage
+from .serializers import UserSerializer
 from django.http import JsonResponse
+from django.conf import settings
 from django.db import transaction
+from .models import User
+from .utils import generate_token
+import jwt, datetime
+
+
+def send_activation_email(user, request, domain):
+    # current_site = get_current_site(request)
+    current_site = domain
+    email_subject = "Activate your account"
+    uidb64 = urlsafe_base64_encode(force_bytes(user.pk))
+
+    activation_link = f"http://{current_site}/activate_user/{uidb64}/{generate_token.make_token(user)}"
+    email_body = f"""
+        Hi {user.name}!
+
+        Thankyou for joining our community.
+        Please use the link below to verify your account:
+
+        {activation_link}
+    """
+    email = EmailMessage(
+        subject=email_subject,
+        body=email_body,
+        from_email=settings.EMAIL_FROM_USER,
+        to=[user.email],
+    )
+    try:
+        email.send(fail_silently=False)
+        return {"detail": "Activation email sent successfully"}
+
+    except Exception as e:
+        raise ValidationError({"detail": "Error - Activation email not sent!"})
 
 
 class RegisterView(APIView):
     def post(self, request):
         email = request.data.get("email", None)
+        frontend_domain = request.data.get("frontendDomain",None) 
         if User.objects.filter(email=email).exists():
-            raise ValidationError("Error - Email already exists.")
+            raise ValidationError({"detail": "Email already exists"})
+
         else:
             serializer = UserSerializer(data=request.data)
             serializer.is_valid(raise_exception=True)
             serializer.save()
-            return Response(serializer.data)
+
+            user = User.objects.filter(email=email).first()
+            response_data = send_activation_email(user, request, frontend_domain)
+            return Response(response_data)
 
 
 class LoginView(APIView):
@@ -29,10 +70,15 @@ class LoginView(APIView):
         user = User.objects.filter(email=email).first()
 
         if user is None:
-            raise AuthenticationFailed("Error - User not found!")
+            raise AuthenticationFailed({"detail": "Error - User not found!"})
 
         if not user.check_password(password):
-            raise AuthenticationFailed("Error - Incorrect Password")
+            raise AuthenticationFailed({"detail": "Error - Incorrect Password"})
+
+        if not user.is_email_verified:
+            raise AuthenticationFailed(
+                {"detail": "Error - Email not verified, Please check your email inbox!"}
+            )
 
         payload = {
             "id": user.id,
@@ -53,14 +99,14 @@ class UserView(APIView):
 
         if not token:
             raise AuthenticationFailed(
-                "Error - Unauthenticated No Token user dashboard"
+                {"detail": "Error - Unauthenticated No Token user dashboard"}
             )
 
         try:
             payload = jwt.decode(token, "secret", algorithms=["HS256"])
         except jwt.ExpiredSignatureError:
             raise AuthenticationFailed(
-                "Error - Unathenticated Token Expired user dashboard"
+                {"detail": "Error - Unathenticated Token Expired user dashboard"}
             )
 
         user = User.objects.filter(id=payload["id"]).first()
@@ -73,13 +119,15 @@ class UsersListView(APIView):
         token = request.COOKIES.get("jwt")
 
         if not token:
-            raise AuthenticationFailed("Error - Unauthenticated No Token users list")
+            raise AuthenticationFailed(
+                {"detail": "Error - Unauthenticated No Token users list"}
+            )
 
         try:
             payload = jwt.decode(token, "secret", algorithms=["HS256"])
         except jwt.ExpiredSignatureError:
             raise AuthenticationFailed(
-                "Error - Unathenticated Token Expired users list"
+                {"detail": "Error - Unathenticated Token Expired users list"}
             )
 
         users = User.objects.all()
@@ -95,7 +143,7 @@ class EditProfileView(APIView):
 
         if not token:
             raise AuthenticationFailed(
-                "Error - Unauthenticated (No Token - Editing profile)"
+                {"detail": "Error - Unauthenticated (No Token - Editing profile)"}
             )
 
         try:
@@ -103,14 +151,14 @@ class EditProfileView(APIView):
             user_id = payload["id"]
         except jwt.ExpiredSignatureError:
             raise AuthenticationFailed(
-                "Error - Unathenticated Token Expired users list"
+                {"detail": "Error - Unathenticated Token Expired users list"}
             )
 
         if (
             new_email
             and User.objects.exclude(id=user_id).filter(email=new_email).exists()
         ):
-            raise ValidationError("Error - Email already exists.")
+            raise ValidationError({"detail": "Error - Email already exists."})
 
         try:
             with transaction.atomic():
@@ -136,7 +184,7 @@ class PasswordResetView(APIView):
 
         if not token:
             raise AuthenticationFailed(
-                "Error - Unauthenticated (No Token - Password reset)"
+                {"detail": "Error - Unauthenticated (No Token - Password reset)"}
             )
 
         try:
@@ -144,16 +192,16 @@ class PasswordResetView(APIView):
             user_id = payload["id"]
         except jwt.ExpiredSignatureError:
             raise AuthenticationFailed(
-                "Error - Unathenticated Token Expired users list"
+                {"detail": "Error - Unathenticated Token Expired users list"}
             )
 
         user = User.objects.filter(id=user_id).first()
 
         if not curr_password:
-            raise ValidationError("Error - Current password is required")
+            raise ValidationError({"detail": "Error - Current password is required"})
 
         if not check_password(curr_password, user.password):
-            raise ValidationError("Error - Incorrect old password")
+            raise ValidationError({"detail": "Error - Incorrect old password"})
 
         try:
             with transaction.atomic():
@@ -164,7 +212,7 @@ class PasswordResetView(APIView):
 
         response = Response()
         response.delete_cookie("jwt")
-        response.data = {"message": "successfully logged out"}
+        response.data = {"detail": "successfully logged out"}
         return response
 
 
@@ -172,5 +220,21 @@ class LogoutView(APIView):
     def post(self, request):
         response = Response()
         response.delete_cookie("jwt")
-        response.data = {"message": "successfully logged out"}
+        response.data = {"detail": "successfully logged out"}
         return response
+
+
+def activate_user(request, uidb64, token):
+    response = Response()
+    try:
+        uid = force_str(urlsafe_base64_decode(uidb64))
+        user = User.objects.get(pk=uid)
+    except Exception as e:
+        user = None
+    if user and generate_token.check_token(user, token):
+        user.is_email_verified = True
+        user.save()
+        
+        return JsonResponse({"detail": "Email verified you can now log in!"}, status=203)
+    else:
+        return JsonResponse({"detail": "Account activation failed!"}, status=403)

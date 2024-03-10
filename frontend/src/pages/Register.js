@@ -12,6 +12,7 @@ const Register = () => {
 	const [rPassword, setRPassword] = useState("");
 	const [errorMessage, setErrorMessage] = useState(false);
 	const [errorResponse, setErrorResponse] = useState("");
+	const [Response, setResponse] = useState("");
 
 	const submit = async (e) => {
 		e.preventDefault();
@@ -20,24 +21,27 @@ const Register = () => {
 			setErrorResponse("Please provide a valid name");
 			return;
 		}
-
+ 
 		if (password !== rPassword) {
 			setErrorMessage(true);
 		} else {
+			const frontendDomain = window.location.origin;
 			const response = await fetch("http://localhost:8000/api/register", {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({ name, email, password }),
+				body: JSON.stringify({ name, email, password, frontendDomain }),
 			});
 
 			try {
 				if (response.ok) {
-					console.log("You are registered successfully!!!");
+					const Response = await response.json();
+					console.log("Message:", Response);
+					setResponse(Response);
 					setRDirect(true);
 				} else {
 					const errorResponse = await response.json();
-					console.log("Error:", errorResponse);
-					setErrorResponse(errorResponse);
+					console.log("Error:", errorResponse.detail);
+					setErrorResponse(errorResponse.detail);
 				}
 			} catch (error) {
 				console.error("Error:", error);
@@ -46,7 +50,7 @@ const Register = () => {
 	};
 
 	if (rDirect) {
-		return <Navigate to="/login" />;
+		return <Navigate to="/" />;
 	}
 
 	return (
@@ -88,6 +92,9 @@ const Register = () => {
 						</div>
 						<div style={{ color: "red", fontWeight: "900" }}>
 							{errorResponse !== "" ? errorResponse : ""}
+						</div>
+						<div style={{ color: "red", fontWeight: "900" }}>
+							{Response !== "" ? Response : ""}
 						</div>
 					</form>
 				</div>

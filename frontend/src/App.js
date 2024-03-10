@@ -1,13 +1,14 @@
-import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Navbar from "./components/nav";
-import Home from "./pages/Home";
-import Login from "./pages/login";
-import Register from "./pages/Register";
-import UsersPage from "./pages/UsersPage";
-import EditInfo from "./pages/EditInfo";
-import "./styles/App.css";
+import React, { useState, useEffect } from "react";
+import ActivationPage from "./pages/ActivationPage";
 import PasswordChange from "./pages/PasswordChange";
+import UsersPage from "./pages/UsersPage";
+import Register from "./pages/Register";
+import EditInfo from "./pages/EditInfo";
+import Navbar from "./components/nav";
+import Login from "./pages/login";
+import Home from "./pages/Home";
+import "./styles/App.css";
 
 function App() {
 	const [name, setName] = useState("");
@@ -48,6 +49,7 @@ function App() {
 						<Route exact path="/login" element={<Login setName={setName} />} />
 						<Route exact path="/register" element={<Register />} />
 						<Route exact path="/users" element={<UsersPage />} />
+						<Route path="/activate_user/:uidb64/:token" element={<ActivationPage />} />
 						<Route
 							exact
 							path="/edit-profile"

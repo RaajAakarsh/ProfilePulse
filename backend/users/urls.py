@@ -7,6 +7,8 @@ from .views import (
     UsersListView,
     EditProfileView,
     PasswordResetView,
+
+    activate_user
 )
 
 urlpatterns = [
@@ -17,4 +19,5 @@ urlpatterns = [
     path("usersfetch", UsersListView.as_view()),
     path("editProfile", EditProfileView.as_view()),
     path("passwordReset", PasswordResetView.as_view()),
+    path('activate_user/<uidb64>/<token>', activate_user, name = 'activate'),
 ]
