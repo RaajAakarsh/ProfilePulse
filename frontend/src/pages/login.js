@@ -61,6 +61,9 @@ const Login = (props) => {
 						<p>
 							Haven't registered? <Link to={"/register"}>Sign up</Link>
 						</p>
+						<p>
+							<Link to={"/forgot-password"}>Forgot Password? </Link>
+						</p>
 						{userMessage !== "" && (
 							<p className="user-message">{userMessage}</p>
 						)}

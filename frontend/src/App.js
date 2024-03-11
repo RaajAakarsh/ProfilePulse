@@ -2,6 +2,8 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import React, { useState, useEffect } from "react";
 import ActivationPage from "./pages/ActivationPage";
 import PasswordChange from "./pages/PasswordChange";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 import UsersPage from "./pages/UsersPage";
 import Register from "./pages/Register";
 import EditInfo from "./pages/EditInfo";
@@ -49,7 +51,14 @@ function App() {
 						<Route exact path="/login" element={<Login setName={setName} />} />
 						<Route exact path="/register" element={<Register />} />
 						<Route exact path="/users" element={<UsersPage />} />
-						<Route path="/activate_user/:uidb64/:token" element={<ActivationPage />} />
+						<Route
+							path="/activate_user/:uidb64/:token"
+							element={<ActivationPage />}
+						/>
+						<Route
+							path="/reset_forgot_password/:uidb64/:token"
+							element={<ResetPassword />}
+						/>
 						<Route
 							exact
 							path="/edit-profile"
@@ -59,6 +68,11 @@ function App() {
 							exact
 							path="/password-change"
 							element={<PasswordChange name={name} setName={setName} />}
+						/>
+						<Route
+							exact
+							path="/forgot-password"
+							element={<ForgotPassword />}
 						/>
 					</Routes>
 				</main>

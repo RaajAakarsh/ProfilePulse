@@ -1,6 +1,7 @@
 from django.contrib.sites.shortcuts import get_current_site
 from django.contrib.auth.hashers import check_password
 from rest_framework.exceptions import AuthenticationFailed, ValidationError
+from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from django.template.loader import render_to_string
 from django.utils.encoding import force_bytes, force_str
@@ -17,7 +18,6 @@ import jwt, datetime
 
 
 def send_activation_email(user, request, domain):
-    # current_site = get_current_site(request)
     current_site = domain
     email_subject = "Activate your account"
     uidb64 = urlsafe_base64_encode(force_bytes(user.pk))
@@ -48,7 +48,7 @@ def send_activation_email(user, request, domain):
 class RegisterView(APIView):
     def post(self, request):
         email = request.data.get("email", None)
-        frontend_domain = request.data.get("frontendDomain",None) 
+        frontend_domain = request.data.get("frontendDomain", None)
         if User.objects.filter(email=email).exists():
             raise ValidationError({"detail": "Email already exists"})
 
@@ -234,7 +234,75 @@ def activate_user(request, uidb64, token):
     if user and generate_token.check_token(user, token):
         user.is_email_verified = True
         user.save()
-        
-        return JsonResponse({"detail": "Email verified you can now log in!"}, status=203)
+
+        return JsonResponse(
+            {"detail": "Email verified you can now log in!"}, status=203
+        )
     else:
         return JsonResponse({"detail": "Account activation failed!"}, status=403)
+
+
+class ForgotPasswordView(APIView):
+    def post(self, request):
+        email = request.data.get("email", None)
+        frontend_domain = request.data.get("frontendDomain", None)
+        if User.objects.filter(email=email).exists():
+            user = User.objects.filter(email=email).first()
+            response_data = send_forgotPassword_email(user, request, frontend_domain)
+        else:
+            raise ValidationError({"detail": "Email does not exist"})
+
+        return Response(response_data)
+
+
+def send_forgotPassword_email(user, request, domain):
+    current_site = domain
+    email_subject = "Forgot Password"
+    uidb64 = urlsafe_base64_encode(force_bytes(user.pk))
+
+    activation_link = f"http://{current_site}/reset_forgot_password/{uidb64}/{generate_token.make_token(user)}"
+    email_body = f"""
+        Hi {user.name}!
+
+        Looks like you have forgotten your password!
+        Please use the link below to reset the password to your account.
+
+        {activation_link}
+    """
+    email = EmailMessage(
+        subject=email_subject,
+        body=email_body,
+        from_email=settings.EMAIL_FROM_USER,
+        to=[user.email],
+    )
+    try:
+        email.send(fail_silently=False)
+        return {"detail": "ForgottenPassword Activation email sent successfully"}
+
+    except Exception as e:
+        raise ValidationError(
+            {"detail": "Error - ForgottenPassword Activation email not sent!"}
+        )
+
+@api_view(['POST'])
+def reset_forgot_password(request, uidb64, token):
+    response = Response()
+    newPassword = request.data.get("newPassword", None)
+    try:
+        uid = force_str(urlsafe_base64_decode(uidb64))
+        user = User.objects.filter(id=uid).first()
+    except Exception as e:
+        user = None
+
+    if user and generate_token.check_token(user, token):
+        with transaction.atomic():
+            user.set_password(newPassword)
+            user.save()
+            return JsonResponse(
+                {
+                    "detail": "Password has been successffully reset, you can now log in!"
+                },
+                status=203,
+            )
+    else:
+        return JsonResponse({"detail": "Password Reset failed!"}, status=403)

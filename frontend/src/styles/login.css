@@ -62,9 +62,6 @@
 	margin-bottom: 15px;
 }
 
-.login-form-start input[type="password"] {
-	margin-bottom: 180px;
-}
 .login-form-start input[type="submit"] {
 	border-radius: 50px;
 	border: none;
