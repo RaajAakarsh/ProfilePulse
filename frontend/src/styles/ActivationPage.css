@@ -1,0 +1,19 @@
+.activation-container {
+	height: 100vh;
+	margin-top: 72px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.activation{
+	border: black;
+	height: 200px;
+	font-size: 25px;
+	color: black;
+	font-weight: 900;
+	text-shadow: 0 0 10px white;
+}
