@@ -8,6 +8,7 @@ import UsersPage from "./pages/UsersPage";
 import Register from "./pages/Register";
 import EditInfo from "./pages/EditInfo";
 import Navbar from "./components/nav";
+import Footer from "./components/Footer";
 import Login from "./pages/login";
 import Home from "./pages/Home";
 import "./styles/App.css";
@@ -76,6 +77,7 @@ function App() {
 						/>
 					</Routes>
 				</main>
+				<Footer></Footer>
 			</Router>
 		</div>
 	);
